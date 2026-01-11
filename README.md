@@ -54,7 +54,7 @@ MEV Defense Shield combines Claude AI's analytical capabilities with Solana's Ji
 
 ## 🚀 Try the Live Demo
 
-**[Launch MEV Defense Shield →](YOUR_DEPLOYMENT_URL)**
+**[Launch MEV Defense Shield →](https://mev-defense-shield-i6dm25kjj-udokas-projects-ca144697.vercel.app/)**
 
 ### Quick Start Guide
 

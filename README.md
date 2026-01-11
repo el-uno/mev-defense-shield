@@ -208,9 +208,9 @@ Current prototype tracks:
 5. Add circuit breakers for unusual activity
 6. Conduct penetration testing
 
-## 📄 License
+<!-- ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. -->
 
 ## 🙏 Acknowledgments
 
@@ -220,8 +220,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact & Community
 
-- **Twitter**: [@YourTwitterHandle](https://twitter.com/yourhandle)
-- **Discord**: [Join our community](https://discord.gg/yourserver)
+- **X**: [Here you go](https://x.com/Udoka_AM)
+- **X Community**: [Join our community on X](https://x.com/Udoka_AM)
 - **Issues**: [GitHub Issues](https://github.com/yourusername/mev-defense-shield/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/yourusername/mev-defense-shield/discussions)
 

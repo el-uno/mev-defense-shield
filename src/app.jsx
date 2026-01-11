@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Zap, AlertTriangle, Check, TrendingUp, Clock, DollarSign, Wallet, Award, Trophy, Share2, Settings, X } from 'lucide-react';
 import { storage } from './utils/storage';
 
+
 const MEVDefenseShield = () => {
   const [tradeAmount, setTradeAmount] = useState('100');
   const [tokenPair, setTokenPair] = useState('SOL/USDC');

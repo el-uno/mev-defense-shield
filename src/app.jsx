@@ -1,9 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Shield, Zap, AlertTriangle, Check, TrendingUp, Clock, DollarSign, Wallet, Award, Trophy, Share2, Settings, X } from 'lucide-react';
 import { storage } from './utils/storage';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { JitoService } from './utils/jito';
+
 
 
 const MEVDefenseShield = () => {
+  const { publicKey, connected, disconnect } = useWallet();
+  const { connection } = useConnection();
+
+  const jitoService = useMemo(() => new JitoService(), []);
+
   const [tradeAmount, setTradeAmount] = useState('100');
   const [tokenPair, setTokenPair] = useState('SOL/USDC');
   const [mevRisk, setMevRisk] = useState(null);
@@ -29,9 +39,11 @@ const MEVDefenseShield = () => {
   const [autoTweet, setAutoTweet] = useState(true);
 
   useEffect(() => {
+  if (connected && publicKey) {
     loadUserData();
     loadLeaderboard();
-  }, []);
+  }
+}, [connected, publicKey]);
 
   const loadUserData = async () => {
     try {
@@ -107,24 +119,33 @@ const MEVDefenseShield = () => {
     }
   };
 
-  const connectWallet = () => {
-    const mockAddress = 'D' + Math.random().toString(36).substring(2, 15) + 'mev';
-    setWalletAddress(mockAddress);
-    setWalletConnected(true);
-    setWalletBalance(Math.random() * 100 + 50);
-  };
 
-  const disconnectWallet = () => {
-    setWalletConnected(false);
-    setWalletAddress('');
-    setWalletBalance(0);
-  };
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (publicKey && connection) {
+        const balance = await connection.getBalance(publicKey);
+        setWalletBalance(balance / LAMPORTS_PER_SOL);
+      }
+    };
+  fetchBalance();
+  }, [publicKey, connection]);
+
+  useEffect(() => {
+    if (publicKey) {
+      setWalletAddress(publicKey.toString());
+      setWalletConnected(true);
+    } else {
+      setWalletAddress('');
+      setWalletConnected(false);
+      setWalletBalance(0);
+    }
+}, [publicKey]);
 
   const analyzeMEVRisk = async () => {
-    if (!walletConnected) {
-      alert('Please connect your wallet first!');
-      return;
-    }
+      if (!connected || !publicKey) {
+         alert('Please connect your wallet first!');
+        return;
+      }
     
     setAnalyzing(true);
     
@@ -230,11 +251,33 @@ Respond with this exact JSON structure:
   };
 
   const executeTrade = async () => {
-    setExecuting(true);
+  setExecuting(true);
+  
+  try {
     
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    if (useJito && mevRisk) {
+    if (useJito && mevRisk && connected && publicKey) {
+      // Protected execution via Jito
+      console.log('🛡️ Executing via Jito Bundle');
+      console.log('Trade details:', {
+        pair: tokenPair,
+        amount: tradeAmount,
+        expectedSavings: savedAmount
+      });
+      
+      // TODO: Uncomment 
+      /*
+      const signature = await jitoService.sendJitoTransaction(
+        transaction, // You'll create this from your trade params
+        [wallet],
+        10000 // 10k lamports tip (~$0.002)
+      );
+      console.log('✅ Jito transaction sent:', signature);
+      */
+      
+      // Simulate successful 
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Save the protected trade
       const newHistory = {
         timestamp: Date.now(),
         pair: tokenPair,
@@ -251,11 +294,34 @@ Respond with this exact JSON structure:
       if (autoTweet) {
         shareSavings();
       }
+      
+      alert(`✅ Trade executed via Jito Bundle!\n\n🛡️ Protected from MEV attacks\n💰 Saved ${savedAmount.toFixed(4)} SOL\n\nTransaction would be sent to Jito Block Engine in production.`);
+      
+    } else if (connected && publicKey) {
+      // Standard RPC execution 
+      console.log('⚠️ Executing via Standard RPC');
+      
+      // TODO: Uncomment 
+      /*
+      const signature = await connection.sendTransaction(transaction, [wallet]);
+      console.log('Standard transaction sent:', signature);
+      */
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      alert(`⚠️ Trade executed via Standard RPC\n\nConsider using Jito protection for better execution.`);
+      
+    } else {
+      alert('❌ Please connect your wallet first!');
     }
     
+  } catch (error) {
+    console.error('❌ Trade execution failed:', error);
+    alert(`Transaction failed: ${error.message}`);
+  } finally {
     setExecuting(false);
-    alert(`Trade executed via ${useJito ? 'Jito Bundle (Protected)' : 'Standard RPC'}!\n\n${useJito ? `You saved ${savedAmount.toFixed(4)} SOL from MEV attacks!` : 'Consider using Jito protection next time.'}`);
-  };
+  }
+};
 
   const shareSavings = () => {
     const text = `Just dodged a ${savedAmount.toFixed(4)} SOL sandwich attack using MEV Defense Shield! Total saved: ${(totalSaved + savedAmount).toFixed(4)} SOL #Solana #DeFi #MEVProtection`;
@@ -302,23 +368,7 @@ Respond with this exact JSON structure:
               <Settings className="w-5 h-5 text-gray-400" />
             </button>
             
-            {!walletConnected ? (
-              <button
-                onClick={connectWallet}
-                className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-4 py-2 rounded-lg font-semibold transition-all"
-              >
-                <Wallet className="w-5 h-5" />
-                <span className="hidden md:inline">Connect Wallet</span>
-              </button>
-            ) : (
-              <button
-                onClick={disconnectWallet}
-                className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-all"
-              >
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span className="hidden md:inline text-sm">{walletAddress.slice(0, 4)}...{walletAddress.slice(-4)}</span>
-              </button>
-            )}
+            <WalletMultiButton />
           </div>
         </div>
 

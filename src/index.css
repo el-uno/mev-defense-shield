@@ -15,3 +15,31 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* Wallet Button Styling */
+.wallet-adapter-button {
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
+  border-radius: 0.5rem !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 1rem !important;
+  transition: all 0.2s !important;
+}
+
+.wallet-adapter-button:hover {
+  background: linear-gradient(135deg, #9333ea 0%, #db2777 100%) !important;
+}
+
+.wallet-adapter-button-trigger {
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background: rgba(15, 23, 42, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.wallet-adapter-modal {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 1rem !important;
+}

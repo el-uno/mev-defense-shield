@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { Shield, Zap, AlertTriangle, Check, TrendingUp, Clock, DollarSign, Wallet, Award, Trophy, Share2, Settings, X } from 'lucide-react';
 import { storage } from './utils/storage';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
@@ -47,7 +47,8 @@ const MEVDefenseShield = () => {
 
   const loadUserData = async () => {
     try {
-      const userData = await storage.get('mev-user-stats');
+      const userData = await chromeStorage.get('mev-user-stats');
+      await chromeStorage.set('mev-user-stats', JSON.stringify(stats));
       if (userData) {
         const stats = JSON.parse(userData.value);
         setTotalSaved(stats.totalSaved || 0);
@@ -67,7 +68,7 @@ const MEVDefenseShield = () => {
     };
     
     try {
-      await storage.set('mev-user-stats' , JSON.stringify(stats));
+      await chromeStorage.set('mev-user-stats', JSON.stringify(stats));
       setTotalSaved(stats.totalSaved);
       setProtectedTrades(stats.protectedTrades);
       setTradeHistory(stats.history);
@@ -80,7 +81,7 @@ const MEVDefenseShield = () => {
 
   const loadLeaderboard = async () => {
     try {
-      const leaderboard = await storage.get('mev-leaderboard', true);
+      const leaderboard = await chromeStorage.get('mev-leaderboard', true);
       if (leaderboard) {
         const data = JSON.parse(leaderboard.value);
         setLeaderboardData(data.top100 || []);
@@ -92,7 +93,7 @@ const MEVDefenseShield = () => {
 
   const updateLeaderboard = async (newTotal) => {
     try {
-      const leaderboard = await storage.get('mev-leaderboard', true);
+      const leaderboard = await chromeStorage.get('mev-leaderboard', true);
       let data = leaderboard ? JSON.parse(leaderboard.value) : { top100: [] };
       
       const existingIndex = data.top100.findIndex(u => u.address === walletAddress);
@@ -109,7 +110,7 @@ const MEVDefenseShield = () => {
       data.top100.sort((a, b) => b.saved - a.saved);
       data.top100 = data.top100.slice(0, 100);
       
-      await storage.set('mev-leaderboard', JSON.stringify(data), true);
+      await chromeStorage.set('mev-leaderboard', JSON.stringify(data), true);
       setLeaderboardData(data.top100);
       
       const rank = data.top100.findIndex(u => u.address === (walletAddress.slice(0, 4) + '...' + walletAddress.slice(-4)));

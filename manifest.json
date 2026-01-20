@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "MEV Defense Shield",
+  "version": "1.0.0",
+  "description": "AI-Powered MEV Protection for Solana",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://jup.ag/*",
+    "https://raydium.io/*",
+    "https://app.orca.so/*"
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://jup.ag/*",
+        "https://raydium.io/*",
+        "https://app.orca.so/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://* http://localhost:*;"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
